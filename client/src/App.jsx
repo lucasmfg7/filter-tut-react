@@ -1,19 +1,28 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import Table from "./Table";
-
+import axios from "axios";
 import { Users } from "./users";
 
 const App = () => {
   const [query, setQuery] = useState("");
+  const [data, setData] = useState([]);
 
-  const keys = ["first_name", "last_name", "email"];
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const res = await axios.get(`http://localhost:5000?q=${query}`);
+      setData(res.data);
+    };
+    if (query.length === 0 || query.length > 2) fetchUsers();
+  }, [query]);
 
-  const search = (data) => {
-    return data.filter((item) =>
-      keys.some((key) => item[key].toLowerCase().includes(query.toLowerCase()))
-    );
-  };
+  // const keys = ["first_name", "last_name", "email"];
+
+  // const search = (data) => {
+  //   return data.filter((item) =>
+  //     keys.some((key) => item[key].toLowerCase().includes(query.toLowerCase()))
+  //   );
+  // };
 
   return (
     <div className="app">
@@ -23,7 +32,9 @@ const App = () => {
         placeholder="Search"
         onChange={(e) => setQuery(e.target.value)}
       />
-      <Table data={search(Users)} />
+      <Table data={data} />
+
+      {/* <Table data={search(Users)} /> */}
 
       {/* <ul className="list">
         {Users.filter((user) =>
